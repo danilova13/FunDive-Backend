@@ -7,6 +7,6 @@ app.get('/health', (req: Request, res: Response) => {
     res.status(200).json("All good in da hood");
 })
 
-app.listen(port, () => {
-    console.log(`App listening on port ${port}`)
+app.listen(port, '0.0.0.0', () => {
+    console.log(`App listening on port http://localhost:${port}`)
 })
