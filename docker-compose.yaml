@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  # defines node.js app 
+  api:
+    # container_name: fundive_container
+    # image: danilova13/fundive:1.0
+    # use build to point it to the current working directory where is can fidn dockerfile
+    build: .
+    # define portforwarding configuration
+    ports: 
+      - "8000:8000"
+    # takes everything from my working directory and mounts it to app directory in the container
+    # when mount volume keeps directories in sync - my working driectory with container directory
+    volumes:
+      - ./src:/app/src
+    entrypoint: npm run dev
+    environment: 
+      - NODE_ENV=development
+    
