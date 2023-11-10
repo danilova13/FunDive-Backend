@@ -1,12 +1,8 @@
 import { ApolloServer, gql } from "apollo-server-express";
 
 // define graphql schema: initial schema with a healthcheck query 
-// and resolver is added 
-const typeDefs = gql(`
-    type Query {
-        health: String
-    }
-`);
+import { typeDefs } from "./schema";
+
 
 const resolvers = {
     Query: {
