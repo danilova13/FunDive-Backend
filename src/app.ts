@@ -1,11 +1,10 @@
 import express, { Request, Response } from 'express';
-import { graphqlServer } from './graphqlServer';
+import { graphqlServer } from './graphql/index';
 
-const app = express();
-const port = 8000;
+// create new app
+async function NewApp() {
 
-
-async function startApolloServer() {
+    const app = express();
     // middleware to parse JSON request bodies
     app.use(express.json());
 
@@ -16,13 +15,11 @@ async function startApolloServer() {
 
     // health check route
     app.get('/health', (req: Request, res: Response) => {
-        res.status(200).json("All good da hood!!!");
+        res.status(200).json("All good in da hood!!!");
     })
 
-    app.listen(port, () => {
-        console.log(`App listening on port ${port}`)
-    })
+    return app;
 }
 
-startApolloServer();
+export { NewApp };
 
