@@ -16,5 +16,22 @@ services:
       - ./src:/app/src
     entrypoint: npm run dev
     environment: 
-      - NODE_ENV=development
-    
+      - NODE_ENV=development 
+  
+  postgres:
+    image: postgres:16
+    container_name: fundive_postgres
+    environment:
+      - POSTGRES_DB
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5433:5432"
+  
+volumes:
+  pgdata: 
+
+
