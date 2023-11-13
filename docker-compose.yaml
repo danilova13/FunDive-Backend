@@ -16,10 +16,9 @@ services:
       - ./src:/app/src
     entrypoint: npm run dev
     environment: 
-      - NODE_ENV=development
+      - NODE_ENV=development 
   
   postgres:
-
     image: postgres:16
     container_name: fundive_postgres
     environment:
@@ -34,4 +33,5 @@ services:
   
 volumes:
   pgdata: 
+
 
