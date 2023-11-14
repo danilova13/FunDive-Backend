@@ -14,11 +14,18 @@ services:
     # when mount volume keeps directories in sync - my working driectory with container directory
     volumes:
       - ./src:/app/src
-    entrypoint: npm run dev
+      - ./package.json:/app/package.json
+      - ./migrations:/app/migrations
+      - ./scripts:/app/scripts
+    entrypoint: ${ENTRYPOINT:-npm run dev}
+    env_file:
+      - .env
     environment: 
       - NODE_ENV=development 
+    depends_on:
+      - db
   
-  postgres:
+  db:
     image: postgres:16
     container_name: fundive_postgres
     environment:

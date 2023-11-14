@@ -10,6 +10,9 @@
     "outDir": "dist"                              
   },
 
-  "include": ["src/**/*.ts"],
+  "include": [
+    "src/**/*.ts", 
+    "migrations/**/*.ts"
+  ],
   "exclude": ["node_modules"]
 }
