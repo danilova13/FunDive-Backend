@@ -1,7 +1,7 @@
 # Use the Node.js 18 image from Docker Hub
 FROM node:18
 
-RUN apt update && apt install -y netcat-traditional
+RUN apt update && apt install -y netcat-traditional iputils-ping
 
 # Set the working directory inside the container to /fun_dive
 # This will be the directory where your app's source code resides
