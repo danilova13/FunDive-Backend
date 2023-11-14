@@ -11,7 +11,7 @@
     "start": "node dist/app.js",
     "dev": "ts-node-dev --poll --respawn --transpile-only src/index.ts",
     "build": "tsc",
-    "migrate": "sh ./scripts/waitfor.sh db:5432 && node-pg-migrate --tsconfig ./tsconfig.json"
+    "migrate": "node-pg-migrate --tsconfig ./tsconfig.json"
   },
   "repository": {
     "type": "git",
