@@ -12,7 +12,7 @@
 
   "include": [
     "src/**/*.ts", 
-    "migrations/**/*.ts"
+    "src/db/migrations/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }

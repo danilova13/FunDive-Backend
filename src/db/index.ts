@@ -1,4 +1,9 @@
 import { Pool } from 'pg';
+import runner from 'node-pg-migrate';
+import path from 'path';
+import type {
+    RunnerOption,
+} from 'node-pg-migrate';
 
 export async function initiateDB() {
     
@@ -27,6 +32,20 @@ export async function initiateDB() {
     return pool;
 }
 
-const dbPool = initiateDB();
-export { dbPool };
-
+export async function runMigrations({
+    direction,
+    databaseUrl,
+}: { 
+    direction: 'up' | 'down', 
+    databaseUrl?: string,
+}) {
+    console.log('URL', process.env.DATABASE_URL)
+    await runner({ 
+        databaseUrl: databaseUrl || process.env.DATABASE_URL as string,
+        migrationsTable: "pgmigrations",
+        dir: path.resolve(__dirname, "./migrations"),
+        direction,
+        count: direction === 'up' ? 1000 : 1,
+        verbose: true
+    })
+}

@@ -11,7 +11,8 @@
     "start": "node dist/app.js",
     "dev": "ts-node-dev --poll --respawn --transpile-only src/index.ts",
     "build": "tsc",
-    "migrate": "node-pg-migrate --tsconfig ./tsconfig.json"
+    "migrate": "ts-node-dev src/db/runMigrations.ts up",
+    "migrate-revert": "ts-node-dev src/db/runMigrations.ts down"
   },
   "repository": {
     "type": "git",
