@@ -1,44 +1,44 @@
-import { Pool } from 'pg'
+import { Pool } from 'pg';
+import { UserData } from '../model/user';
 
 export class User {
-    dive_id: number;
-    email: string;
-    id!: number;
-    last_name: string;
-    name: string;
-    phone: string;
     pool: Pool;
 
     constructor(pool: Pool){
         this.pool = pool;
     }
 
-    async saveUser(userData: {
-        dive_id: number;
-        email: string;
-        id: number;
-        last_name:string;
-        name: string;
-        phone: string;
-    }){
+    async saveUser(userData: UserData): Promise<UserData | null>{
         try {
             const result = await this.pool.query(
-                `INSERT INTO users(dive_id, email, id, last_name, name, phone)
-                    VALUES($1, $2, $3, $4, $5, $6)
+                `INSERT INTO users(dive_id, email, last_name, name, phone)
+                    VALUES($1, $2, $3, $4)
                     RETURNING *
-                `, [userData.dive_id, userData.email, userData.id, userData.last_name, userData.name, userData.phone]
+                `, [userData.email, userData.last_name, userData.name, userData.phone]
             );
-            return result.rows[0];
+            if (!result.rows[0]) {
+                return null;
+            }
+            const user : UserData = result.rows[0]
+            return user;
         } catch(error) {
             console.error('Error in saveUser', error);
             throw error;
         }
     }
 
-    async getUserById(id: number){
+    async getUserById(id: number): Promise<UserData | null>{
         try {
             const result = await this.pool.query('SELECT * FROM users WHERE id=$1', [id]);
-            return result.rows[0];
+            if (result.rows[0].length === 0) {
+                return null;
+            }
+            if (!result.rows[0]) {
+                return null;
+            }
+
+            const user: UserData = result.rows[0];
+            return user;
         } catch (error) {
             console.error('Error in getUserById', error);
             throw error;

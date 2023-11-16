@@ -7,7 +7,6 @@ export async function up(pgm: MigrationBuilder): Promise<void>{
             name text NOT NULL,
             last_name text NOT NULL,
             email text NOT NULL UNIQUE,
-            dive_id INT NOT NULL UNIQUE,
             phone text,
             created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
             updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()

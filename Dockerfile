@@ -24,3 +24,4 @@ RUN npm run build
 # If you're compiling TypeScript to JavaScript
 # specify the output directory and main JS file
 ENTRYPOINT ["node", "dist/app.js"]
+
