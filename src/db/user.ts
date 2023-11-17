@@ -14,7 +14,7 @@ export class User {
                 `INSERT INTO users(dive_id, email, last_name, name, phone)
                     VALUES($1, $2, $3, $4)
                     RETURNING *
-                `, [userData.email, userData.last_name, userData.name, userData.phone]
+                `, [userData.email, userData.lastName, userData.name, userData.phone]
             );
             if (!result.rows[0]) {
                 return null;

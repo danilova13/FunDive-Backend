@@ -2,7 +2,6 @@ import { runMigrations } from ".";
 
 async function executeMigration() {
     const { argv } = process;
-    // [ts-node-dev, src/db/runMigrations.ts, up
     const direction = argv[2];
 
     // throw error if not up or down
