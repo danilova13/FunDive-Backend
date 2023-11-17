@@ -30,9 +30,7 @@ export class UserDB {
     async getUserById(id: number): Promise<User | null>{
         try {
             const result = await this.pool.query('SELECT * FROM users WHERE id=$1', [id]);
-            if (result.rows[0].length === 0) {
-                return null;
-            }
+          
             if (!result.rows[0]) {
                 return null;
             }
