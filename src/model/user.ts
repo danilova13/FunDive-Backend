@@ -1,7 +1,14 @@
 export type User = {
     email: string;
-    id: number;
-    lastName: string;
     firstName: string;
+    id?: number;
+    lastName: string;
+    phone: string;
+}
+
+export type UserForm = {
+    email: string;
+    firstName: string;
+    lastName: string;
     phone: string;
 }
