@@ -1,7 +1,7 @@
-export type UserData = {
+export type User = {
     email: string;
     id: number;
     lastName: string;
-    name: string;
+    firstName: string;
     phone: string;
 }
