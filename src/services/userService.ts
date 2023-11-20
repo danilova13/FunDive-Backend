@@ -1,6 +1,6 @@
 import { UserDB } from "../db/user";
 import { User, UserForm } from "../model/user";
-
+import { validateUserForm } from "../model/user";
 
 export class UserService {
     userDB: UserDB;
@@ -11,10 +11,8 @@ export class UserService {
 
     async createUser(userForm: UserForm): Promise<User | null> {
         try{
-            // validation to make sure name, last name, email not empty string
-            if(userForm.email === '' || userForm.firstName === '' || userForm.lastName === '' || userForm.phone === '') {
-                throw new Error('You must enter valid information!')
-            }
+            // validate userForm
+            validateUserForm(userForm);
 
             // build user
             const user: User = {
