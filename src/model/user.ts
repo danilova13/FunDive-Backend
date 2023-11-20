@@ -16,7 +16,7 @@ export type UserForm = {
     phone: string;
 }
 
-export async function validateUserForm(userForm: UserForm): Promise<UserForm | null> {
+export function validateUserForm(userForm: UserForm): UserForm {
         // validate email 
         if(!EmailValidator.validate(userForm.email)){
             throw new Error('This email is not valid, please enter a valid email!');
