@@ -4,7 +4,7 @@ export async function up(pgm: MigrationBuilder): Promise<void>{
     pgm.sql(`
         CREATE TABLE users(
             id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-            name text NOT NULL,
+            first_name text NOT NULL,
             last_name text NOT NULL,
             email text NOT NULL UNIQUE,
             phone text,

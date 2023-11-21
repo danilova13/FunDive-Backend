@@ -1,5 +1,8 @@
 import express, { Request, Response } from 'express';
-import { graphqlServer } from './graphql/index';
+import { buildGraphQLServer } from './graphql/index';
+import { UserDB } from './db/user';
+import { initiateDB } from './db';
+import { UserService } from './services/userService';
 
 // create new app
 async function NewApp() {
@@ -8,8 +11,12 @@ async function NewApp() {
     // middleware to parse JSON request bodies
     app.use(express.json());
 
-    await graphqlServer.start();
+    const pool = await initiateDB()
+    const userDB = new UserDB(pool);
+    const userService = new UserService(userDB);
+    const graphqlServer = await buildGraphQLServer(userService);
     
+    await graphqlServer.start();
     // apply Apollo GrapqhQL middleware
     graphqlServer.applyMiddleware({app, path: '/graphql'});
 

@@ -11,7 +11,7 @@ export class UserDB {
     async saveUser(userData: User): Promise<User | null>{
         try {
             const result = await this.pool.query(
-                `INSERT INTO users(dive_id, email, last_name, name, phone)
+                `INSERT INTO users(email, last_name, first_name, phone)
                     VALUES($1, $2, $3, $4)
                     RETURNING *
                 `, [userData.email, userData.lastName, userData.firstName, userData.phone]
@@ -19,7 +19,8 @@ export class UserDB {
             if (!result.rows[0]) {
                 return null;
             }
-            const user: User = this.transformUser(result.rows[0])
+            const user: User = this.transformUser(result.rows[0]);
+            console.log(user);
             return user;
         } catch(error) {
             console.error('Error in saveUser', error);
