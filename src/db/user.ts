@@ -42,6 +42,33 @@ export class UserDB {
         }
     }
 
+    async updateUserById(id: number, userData: User): Promise<User | null> {
+        try{
+            // 
+            const fields = '';
+            const values: any = [];
+            // for each field in userData
+            // include fields if they are provided 
+            // add them to fields ex: phone = $2, email = $3, etc...
+            // add them to values userData.phone, userData.email ...
+            const result = await this.pool.query(`
+                UPDATE users
+                    SET
+                        ${fields}
+                    WHERE id = $1
+                    RETURNING *
+            `, [id, ...values])
+            if(!result.rows[0]){
+                return null;
+            }
+            const user: User = this.transformUser(result.rows[0]);
+            return user;
+        } catch (error) {
+            console.error('Error in updateUserById', error);
+            throw error;
+        }
+    }
+
     transformUser(dbUser: Record<string, any>): User {
         const user: User = {
             email: dbUser.email,

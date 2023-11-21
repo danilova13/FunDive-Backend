@@ -21,5 +21,12 @@ export const typeDefs = gql(`
             lastName: String!,
             phone: String!
         ): User!
+        updateUserById(
+            id: ID!,
+            email: String, 
+            firstName: String,
+            lastName: String,
+            phone: String
+        ): User
     }
 `);
