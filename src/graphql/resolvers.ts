@@ -1,8 +1,17 @@
 import { ApolloServer, gql } from "apollo-server-express";
+import { buildCreateUserResolver } from "./mutations";
+import { UserService } from "../services/userService";
+import { buildGetUserByIdResolver } from "./queries";
 
-export const resolvers = {
+export const buildResolvers = (
+    userService: UserService,
+) => ({
     Query: {
         health: () => 'Hello healthy web!',
-    }
-};
+        getUserById: buildGetUserByIdResolver(userService),
+    },
 
+    Mutation: {
+        createUser: buildCreateUserResolver(userService),
+    }
+});
