@@ -24,13 +24,13 @@ export const buildUpdateUserByIdResolver = (
     userService: UserService,
 ) => {
     const updateUserByIdResolver = async (parent: any, args: any) => {
-        const { id } = args;
+        const { id, patch } = args;
         // construct userForm object
         const userForm: UserForm = {
-            email: args.email,
-            firstName: args.firstName,
-            lastName: args.lastName,
-            phone: args.phone
+            email: patch.email,
+            firstName: patch.firstName,
+            lastName: patch.lastName,
+            phone: patch.phone
         }
         
         return userService.updateUserById(id, userForm);

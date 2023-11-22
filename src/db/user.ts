@@ -44,20 +44,41 @@ export class UserDB {
 
     async updateUserById(id: number, userData: User): Promise<User | null> {
         try{
-            // 
-            const fields = '';
+            // dynamically build out a query string and array
+            const fields: string[] = [];
             const values: any = [];
+            let fieldCount = 2;
+
+            const fieldMappings: {[key in keyof User]?: string } = {
+                email: 'email',
+                lastName: 'last_name',
+                firstName: 'first_name',
+                phone: 'phone',
+            }
             // for each field in userData
-            // include fields if they are provided 
-            // add them to fields ex: phone = $2, email = $3, etc...
-            // add them to values userData.phone, userData.email ...
+            Object.keys(userData).forEach((key) => {
+                // include fields if they are provided
+                const value = userData[key as keyof User];
+                if (value === undefined) {
+                    return;
+                }
+
+                const dbFieldName = fieldMappings[key as keyof User];
+                // add them to fields ex: phone = $2, email = $3, etc...
+                fields.push(`${dbFieldName} = $${fieldCount}`);
+                // add them to values - userData.phone, userData.email ...
+                values.push(value);
+                fieldCount++;
+            })
+             
             const result = await this.pool.query(`
                 UPDATE users
                     SET
-                        ${fields}
+                        ${fields.join(', ')}
                     WHERE id = $1
                     RETURNING *
             `, [id, ...values])
+
             if(!result.rows[0]){
                 return null;
             }
