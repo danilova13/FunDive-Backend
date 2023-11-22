@@ -12,7 +12,7 @@ export class UserService {
     async createUser(userForm: UserForm): Promise<User | null> {
         try{
             // validate userForm
-            validateUserForm(userForm);
+            validateUserForm(userForm, true);
 
             // build user
             const user: User = {
@@ -39,6 +39,30 @@ export class UserService {
             return user;
         } catch(error) {
             console.error('Error in getUserById', error);
+            throw error;
+        }
+    }
+
+    async updateUserById(id: number, userForm: UserForm): Promise<User | null> {
+        try{
+            // validate userForm
+            validateUserForm(userForm, false);
+
+            // build user
+            const user: User = {
+                email: userForm.email,
+                lastName: userForm.lastName,
+                firstName: userForm.firstName,
+                phone: userForm.phone
+            }
+
+            const updatedUser = await this.userDB.updateUserById(id, user);
+
+            console.log(updatedUser);
+            
+            return updatedUser;
+        } catch (error) {
+            console.error('Error in updateUserById', error);
             throw error;
         }
     }

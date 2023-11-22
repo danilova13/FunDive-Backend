@@ -14,6 +14,13 @@ export const typeDefs = gql(`
         phone: String!
     }
 
+    input UserPatch {
+        email: String, 
+        firstName: String,
+        lastName: String,
+        phone: String
+    }
+
     type Mutation {
         createUser(
             email: String!, 
@@ -21,5 +28,10 @@ export const typeDefs = gql(`
             lastName: String!,
             phone: String!
         ): User!
+
+        updateUserById(
+            id: ID!,
+            patch: UserPatch!
+        ): User
     }
 `);
