@@ -1,5 +1,6 @@
 import { Pool } from 'pg';
 import { User } from '../model/user';
+import { getFieldValues } from './helpers';
 
 export class UserDB {
     pool: Pool;
@@ -44,40 +45,18 @@ export class UserDB {
 
     async updateUserById(id: number, userData: User): Promise<User | null> {
         try{
-            // dynamically build out a query string and array
-            const fields: string[] = [];
-            const values: any = [];
-            let fieldCount = 2;
+            const { fields, values } = getFieldValues(userData);
 
-            const fieldMappings: {[key in keyof User]?: string } = {
-                email: 'email',
-                lastName: 'last_name',
-                firstName: 'first_name',
-                phone: 'phone',
-            }
-            // for each field in userData
-            Object.keys(userData).forEach((key) => {
-                // include fields if they are provided
-                const value = userData[key as keyof User];
-                if (value === undefined) {
-                    return;
-                }
-
-                const dbFieldName = fieldMappings[key as keyof User];
-                // add them to fields ex: phone = $2, email = $3, etc...
-                fields.push(`${dbFieldName} = $${fieldCount}`);
-                // add them to values - userData.phone, userData.email ...
-                values.push(value);
-                fieldCount++;
-            })
+             console.log(fields);
+             console.log(values);
              
             const result = await this.pool.query(`
                 UPDATE users
                     SET
                         ${fields.join(', ')}
-                    WHERE id = $1
+                    WHERE id = $${values.length + 1}
                     RETURNING *
-            `, [id, ...values])
+            `, [...values, id])
 
             if(!result.rows[0]){
                 return null;
