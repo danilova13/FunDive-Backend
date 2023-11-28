@@ -1,7 +1,7 @@
 import { snakeCase } from "change-case";
 
 type FieldValues = {
-    values: any[],
+    values: unknown[],
     fields: string[]
 }
 
