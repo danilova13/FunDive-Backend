@@ -46,10 +46,7 @@ export class UserDB {
     async updateUserById(id: number, userData: User): Promise<User | null> {
         try{
             const { fields, values } = getFieldValues(userData);
-
-             console.log(fields);
-             console.log(values);
-             
+            
             const result = await this.pool.query(`
                 UPDATE users
                     SET
