@@ -12,7 +12,7 @@ export const typeDefs = gql(`
         id: ID!
         lastName: String!
         phone: String!
-        passwordHash: String!
+        password: String!
     }
 
     input UserPatch {
@@ -20,7 +20,7 @@ export const typeDefs = gql(`
         firstName: String,
         lastName: String,
         phone: String,
-        passwordHash: String
+        password: String
     }
 
     type Mutation {
@@ -29,7 +29,7 @@ export const typeDefs = gql(`
             firstName: String!,
             lastName: String!,
             phone: String!,
-            passwordHash: String!
+            password: String!
         ): User!
 
         updateUserById(

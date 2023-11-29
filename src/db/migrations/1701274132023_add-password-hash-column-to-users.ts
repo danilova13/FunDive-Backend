@@ -4,13 +4,13 @@ import { MigrationBuilder, ColumnDefinitions } from 'node-pg-migrate';
 export async function up(pgm: MigrationBuilder): Promise<void> {
     pgm.sql(`
         ALTER TABLE users
-            ADD COLUMN password_hash text NOT NULL;
+            ADD COLUMN password text NOT NULL;
     `);
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
     pgm.sql(`
         ALTER TABLE users
-            DROP COLUMN password_hash;
+            DROP COLUMN password;
     `);
 }

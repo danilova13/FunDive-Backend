@@ -13,10 +13,10 @@ export class UserDB {
     async saveUser(userData: User): Promise<User | null>{
         try {
             const result = await this.pool.query(
-                `INSERT INTO users(email, last_name, first_name, phone, password_hash)
+                `INSERT INTO users(email, last_name, first_name, phone, password)
                     VALUES($1, $2, $3, $4, $5)
                     RETURNING *
-                `, [userData.email, userData.lastName, userData.firstName, userData.phone, userData.passwordHash]
+                `, [userData.email, userData.lastName, userData.firstName, userData.phone, userData.password]
             );
             if (!result.rows[0]) {
                 return null;
@@ -73,7 +73,7 @@ export class UserDB {
             lastName: dbUser.last_name,
             firstName: dbUser.first_name,
             phone: dbUser.phone,
-            passwordHash: dbUser.password_hash
+            password: dbUser.password
         }
 
         return user;
