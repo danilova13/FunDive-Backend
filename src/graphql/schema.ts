@@ -12,13 +12,15 @@ export const typeDefs = gql(`
         id: ID!
         lastName: String!
         phone: String!
+        passwordHash: String!
     }
 
     input UserPatch {
         email: String, 
         firstName: String,
         lastName: String,
-        phone: String
+        phone: String,
+        passwordHash: String
     }
 
     type Mutation {
@@ -26,7 +28,8 @@ export const typeDefs = gql(`
             email: String!, 
             firstName: String!,
             lastName: String!,
-            phone: String!
+            phone: String!,
+            passwordHash: String!
         ): User!
 
         updateUserById(

@@ -2,6 +2,7 @@ import { Pool } from 'pg';
 import { User } from '../model/user';
 import { getFieldValues } from './helpers';
 
+
 export class UserDB {
     pool: Pool;
 
@@ -12,16 +13,15 @@ export class UserDB {
     async saveUser(userData: User): Promise<User | null>{
         try {
             const result = await this.pool.query(
-                `INSERT INTO users(email, last_name, first_name, phone)
-                    VALUES($1, $2, $3, $4)
+                `INSERT INTO users(email, last_name, first_name, phone, password_hash)
+                    VALUES($1, $2, $3, $4, $5)
                     RETURNING *
-                `, [userData.email, userData.lastName, userData.firstName, userData.phone]
+                `, [userData.email, userData.lastName, userData.firstName, userData.phone, userData.passwordHash]
             );
             if (!result.rows[0]) {
                 return null;
             }
             const user: User = this.transformUser(result.rows[0]);
-            console.log(user);
             return user;
         } catch(error) {
             console.error('Error in saveUser', error);
@@ -72,7 +72,8 @@ export class UserDB {
             id: dbUser.id,
             lastName: dbUser.last_name,
             firstName: dbUser.first_name,
-            phone: dbUser.phone
+            phone: dbUser.phone,
+            passwordHash: dbUser.password_hash
         }
 
         return user;
