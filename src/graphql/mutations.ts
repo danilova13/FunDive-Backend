@@ -11,7 +11,8 @@ export const buildCreateUserResolver = (
             email: args.email,
             firstName: args.firstName,
             lastName: args.lastName,
-            phone: args.phone
+            phone: args.phone,
+            password: args.password
         }
     
         return userService.createUser(userForm)
@@ -30,13 +31,13 @@ export const buildUpdateUserByIdResolver = (
             email: patch.email,
             firstName: patch.firstName,
             lastName: patch.lastName,
-            phone: patch.phone
+            phone: patch.phone,
+            password: patch.password
         }
         
         return userService.updateUserById(id, userForm);
 
     }
 
-    console.log(updateUserByIdResolver);
     return updateUserByIdResolver;
 }

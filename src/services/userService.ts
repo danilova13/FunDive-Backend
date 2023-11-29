@@ -1,6 +1,7 @@
 import { UserDB } from "../db/user";
 import { User, UserForm } from "../model/user";
-import { validateUserForm } from "../model/user";
+import { validateUserForm } from "../model/user"; 
+import bcrypt from 'bcrypt';
 
 export class UserService {
     userDB: UserDB;
@@ -14,12 +15,17 @@ export class UserService {
             // validate userForm
             validateUserForm(userForm, true);
 
-            // build user
-            const user: User = {
+            // hash the password 
+            const cost = 10; 
+            const hash = await bcrypt.hash(userForm.password, cost);
+
+             // build user
+             const user: User = {
                 email: userForm.email,
                 lastName: userForm.lastName,
                 firstName: userForm.firstName,
-                phone: userForm.phone
+                phone: userForm.phone, 
+                password: hash
             }
 
             // save new user to db based on the built user 
@@ -53,13 +59,11 @@ export class UserService {
                 email: userForm.email,
                 lastName: userForm.lastName,
                 firstName: userForm.firstName,
-                phone: userForm.phone
+                phone: userForm.phone,
+                password: userForm.password
             }
 
             const updatedUser = await this.userDB.updateUserById(id, user);
-
-            console.log(updatedUser);
-            
             return updatedUser;
         } catch (error) {
             console.error('Error in updateUserById', error);

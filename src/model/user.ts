@@ -8,6 +8,7 @@ export type User = {
     id?: number;
     lastName: string;
     phone: string;
+    password: string;
 }
 
 export type UserForm = {
@@ -15,6 +16,7 @@ export type UserForm = {
     firstName: string;
     lastName: string;
     phone: string;
+    password: string;
 }
 
 export function validateUserForm(userForm: UserForm, areFieldsRequired: Boolean): UserForm {
