@@ -15,6 +15,15 @@ export const typeDefs = gql(`
         password: String!
     }
 
+    type Auth {
+        jwtToken: String!
+    }
+
+    type AuthenticationPayload {
+        user: User
+        auth: Auth
+    }
+
     input UserPatch {
         email: String, 
         firstName: String,
@@ -30,11 +39,16 @@ export const typeDefs = gql(`
             lastName: String!,
             phone: String!,
             password: String!
-        ): User!
+        ): AuthenticationPayload!
 
         updateUserById(
             id: ID!,
             patch: UserPatch!
         ): User
+
+        loginUser(
+            email: String!,
+            password: String!
+        ): AuthenticationPayload!
     }
 `);

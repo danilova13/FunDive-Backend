@@ -5,7 +5,7 @@ import { isValidPhoneNumber } from 'libphonenumber-js/min';
 export type User = {
     email: string;
     firstName: string;
-    id?: number;
+    id: number;
     lastName: string;
     phone: string;
     password: string;
@@ -16,6 +16,20 @@ export type UserForm = {
     firstName: string;
     lastName: string;
     phone: string;
+    password: string;
+}
+
+export type Auth = {
+    jwtToken: string;
+}
+
+export type AuthenticationPayload = {
+    user: User;
+    auth: Auth;
+}
+
+export type LoginForm = {
+    email: string;
     password: string;
 }
 

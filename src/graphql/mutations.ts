@@ -1,4 +1,4 @@
-import { UserForm } from "../model/user"
+import { UserForm, LoginForm } from "../model/user"
 import { UserService } from "../services/userService"
 
 // create a function that takes userService and returns resolvers
@@ -40,4 +40,20 @@ export const buildUpdateUserByIdResolver = (
     }
 
     return updateUserByIdResolver;
+}
+
+export const buildLoginUserResolver = (
+    userService: UserService,
+) => {
+    const loginUserResolver = async (parent: any, args: any) => {
+        // construct loginForm object
+        const loginForm: LoginForm = {
+            email: args.email,
+            password: args.password
+        }
+
+        return userService.loginUser(loginForm);
+    }
+
+    return loginUserResolver;
 }
