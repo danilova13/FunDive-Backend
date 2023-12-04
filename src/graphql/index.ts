@@ -2,7 +2,7 @@ import { ApolloServer, gql } from "apollo-server-express";
 import { buildResolvers } from "./resolvers";
 import { typeDefs } from "./schema";
 import { UserService } from "../services/userService";
-import { context } from "../auth/authorization";
+import { context } from "../auth/middleware";
 
 export const buildGraphQLServer = (
     userService: UserService

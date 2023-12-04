@@ -1,4 +1,4 @@
-import { context } from "../auth/authorization"
+import { context } from "../auth/middleware"
 import { UserForm, LoginForm } from "../model/user"
 import { UserService } from "../services/userService"
 
