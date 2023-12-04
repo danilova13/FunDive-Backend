@@ -1,4 +1,4 @@
-import { context } from "../middleware/authorization"
+import { context } from "../auth/authorization"
 import { UserForm, LoginForm } from "../model/user"
 import { UserService } from "../services/userService"
 
@@ -8,7 +8,7 @@ export const buildCreateUserResolver = (
 ) => {   
     const createUserResolver = async (parent: any, args: any, context: any) => {
         if (context.user) {
-            return;
+            throw new Error("Logged-in users cannot create a new account!");
         }
         // construct userForm object
         const userForm: UserForm = {

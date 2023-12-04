@@ -36,7 +36,7 @@ export class UserDB {
             const user: User = this.transformUser(result.rows[0]);
             return user;
         } catch(error) {
-            console.error('Error in loginUser', error);
+            console.error('Error in getUserByEmail', error);
             throw error;
         }
     }

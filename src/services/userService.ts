@@ -2,7 +2,7 @@ import { UserDB } from "../db/user";
 import { User, UserForm, AuthenticationPayload, LoginForm, Auth } from "../model/user";
 import { validateUserForm } from "../model/user"; 
 import bcrypt from 'bcrypt';
-import { jwtGenerator } from "../utils/jwtGenerator";
+import { jwtGenerator } from "../auth/jwtGenerator";
 
 export class UserService {
     userDB: UserDB;
