@@ -1,5 +1,5 @@
 import { ApolloServer, gql } from "apollo-server-express";
-import { buildCreateUserResolver, buildUpdateUserByIdResolver } from "./mutations";
+import { buildCreateUserResolver, buildLoginUserResolver, buildUpdateUserByIdResolver } from "./mutations";
 import { UserService } from "../services/userService";
 import { buildGetUserByIdResolver } from "./queries";
 
@@ -14,5 +14,6 @@ export const buildResolvers = (
     Mutation: {
         createUser: buildCreateUserResolver(userService),
         updateUserById: buildUpdateUserByIdResolver(userService),
+        loginUser: buildLoginUserResolver(userService),
     }
 });

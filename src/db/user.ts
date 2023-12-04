@@ -1,5 +1,5 @@
 import { Pool } from 'pg';
-import { User } from '../model/user';
+import { LoginForm, User, UserForm } from '../model/user';
 import { getFieldValues } from './helpers';
 
 
@@ -10,7 +10,7 @@ export class UserDB {
         this.pool = pool;
     }
 
-    async saveUser(userData: User): Promise<User | null>{
+    async saveUser(userData: UserForm): Promise<User>{
         try {
             const result = await this.pool.query(
                 `INSERT INTO users(email, last_name, first_name, phone, password)
@@ -18,13 +18,25 @@ export class UserDB {
                     RETURNING *
                 `, [userData.email, userData.lastName, userData.firstName, userData.phone, userData.password]
             );
+            const user: User = this.transformUser(result.rows[0]);
+            return user;
+        } catch(error) {
+            console.error('Error in saveUser', error);
+            throw error;
+        }
+    }
+
+    async getUserByEmail(email: string): Promise<User | null> {
+        try{
+            const result = await this.pool.query('SELECT * FROM users WHERE email = $1', [email]);
+
             if (!result.rows[0]) {
                 return null;
             }
             const user: User = this.transformUser(result.rows[0]);
             return user;
         } catch(error) {
-            console.error('Error in saveUser', error);
+            console.error('Error in getUserByEmail', error);
             throw error;
         }
     }
@@ -43,7 +55,7 @@ export class UserDB {
         }
     }
 
-    async updateUserById(id: number, userData: User): Promise<User | null> {
+    async updateUserById(id: number, userData: UserForm): Promise<User | null> {
         try{
             const { fields, values } = getFieldValues(userData);
             
