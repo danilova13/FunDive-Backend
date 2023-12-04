@@ -3,13 +3,13 @@ import { gql } from "apollo-server-express";
 export const typeDefs = gql(`
     type Query {
         health: String
-        getUserById (id: ID!): User
+        getUserById (id: Int!): User
     }
 
     type User {
         email: String!
         firstName: String!
-        id: ID!
+        id: Int!
         lastName: String!
         phone: String!
         password: String!
@@ -42,7 +42,7 @@ export const typeDefs = gql(`
         ): AuthenticationPayload!
 
         updateUserById(
-            id: ID!,
+            id: Int!,
             patch: UserPatch!
         ): User
 

@@ -1,36 +1,39 @@
-import type {
-    RequestHandler,
-    NextFunction,
-    Request,
-    Response,
-} from 'express';
 import jwt from 'jsonwebtoken';
-import { JWTPayload } from '../model/user';
+import { Request, Response } from 'express';
 
-export const authMiddleware: RequestHandler = async (
-    req: Request, 
-    res: Response, 
-    next: NextFunction
-) => {
+
+export const getUser = async(jwtToken: string) => {
     try {
-        // destructure the token and get the token from the req header
-        const jwtToken = req.header("token");
-
-        // check if token exists
-        if(!jwtToken) {
-            return res.status(401).send("Not Authorized");
+        if (!jwtToken) {
+          throw new Error('Not Authorized!')
         }
-        // check if valid 
-        const payload = jwt.verify(jwtToken, process.env.jwtSecret as string);
-       
-        // allows to access properties of payload in other middlewares and controllers
-        req.jwtPayload = payload as JWTPayload;
-
-        next();
-    } catch(error) {
-        console.error('Not Authorized', error);
-        throw error;
-    }
+        const user = jwt.verify(jwtToken, process.env.jwtSecret as string);
+        return user;
+      } catch (error) {
+        return null;
+      }
 }
+
+export const context = async ({ req, res }: {req: Request, res: Response}) => {
+   
+    // get user token from the headers
+    const authHeader = req.headers.authorization || '';
+
+    if (!authHeader) {
+        return;
+    }
+
+    const jwtToken = authHeader.split(' ')[1]; 
+
+    // retrieve a user with the token
+    const user = await getUser(jwtToken);
+
+    if (!user) {
+        throw new Error('User is not authenticated');
+    }
+    // add user to context
+    return { user };
+}
+
 
 

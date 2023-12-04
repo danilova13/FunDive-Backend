@@ -7,7 +7,7 @@ export function jwtGenerator(id: number) {
         userId: id
     }
     try {
-        return jwt.sign(payload, process.env.jwtSecret as string, { expiresIn: "1hr" });
+        return jwt.sign(payload, process.env.jwtSecret as string, { expiresIn: "2hr" });
     } catch (error) {
         console.error("Error generating JWT:", error);
         throw error;
