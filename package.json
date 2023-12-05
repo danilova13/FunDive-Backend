@@ -1,5 +1,5 @@
 {
-  "name": "fun-dive",
+  "name": "fundive-backend",
   "version": "1.0.0",
   "engines": {
     "node": "18.x"
@@ -17,15 +17,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/danilova13/FunDive.git"
+    "url": "git+https://github.com/danilova13/FunDive-Backend.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/danilova13/FunDive/issues"
+    "url": "https://github.com/danilova13/FunDive-Backend/issues"
   },
-  "homepage": "https://github.com/danilova13/FunDive#readme",
+  "homepage": "https://github.com/danilova13/FunDive-Backend#readme",
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
     "@types/express": "^4.17.17",
