@@ -23,12 +23,12 @@ export const context = async ({ req, res }: {req: Request, res: Response}) => {
         return;
     }
 
-    if (!authHeader.startsWith("Bearer ")) {
+    const [ bearer, jwtToken ] = authHeader.split(' '); 
+
+    if (bearer !== "Bearer") {
       throw new Error("Authorization header does not have a correct format!");
     }
-    
-    const jwtToken = authHeader.split(' ')[1]; 
-
+  
     // retrieve a user with the token
     const user = await getUser(jwtToken);
 

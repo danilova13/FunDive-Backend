@@ -1,5 +1,4 @@
 import { ApolloServer, gql } from "apollo-server-express";
-import { buildCreateUserResolver, buildLoginUserResolver, buildUpdateUserByIdResolver } from "./mutations";
 import { UserService } from "../services/userService";
 import { UserForm, LoginForm } from "../model/user";
 
