@@ -61,8 +61,6 @@ export class UserService {
             // check if entered password is the same as the hashed one in db
             const validPassword = await bcrypt.compare(loginForm.password, user.password);
 
-            console.log(validPassword);
-
             if(!validPassword) {
                 throw new Error("Invalid credentials")
             }
