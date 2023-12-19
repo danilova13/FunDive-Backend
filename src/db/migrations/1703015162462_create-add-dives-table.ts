@@ -6,9 +6,9 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
         CREATE TABLE dives(
             id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
             name text NOT NULL,
-            date text NOT NULL,
+            date TIMESTAMPTZ NOT NULL,
             description text NOT NULL,
-            duration text NOT NULL,
+            duration INT NOT NULL,
             location text NOT NULL,
             user_id INT REFERENCES users(id),
             created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
