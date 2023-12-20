@@ -57,6 +57,31 @@ export class DiveDB {
         }
     }
 
+    async updateDiveById(id: number, diveData: DiveForm): Promise<Dive | null>{
+        try{
+            const { fields, values } = getFieldValues(diveData);
+
+            const result = await this.pool.query(`
+                UPDATE dives
+                    SET 
+                        ${fields.join(', ')}
+                        WHERE id = $${values.length + 1}
+                        RETURNING *
+            `, [...values, id])
+
+            if(!result.rows[0]){
+                return null;
+            }
+
+            const dive: Dive = this.transformDive(result.rows[0]);
+            return dive;
+
+        } catch(error) {
+            console.error('Error in updateDiveById', error);
+            throw error;
+        }
+    }
+
     transformDive(dbDive: Record<string, any>): Dive {
         const dive: Dive = {
             id: dbDive.id,
