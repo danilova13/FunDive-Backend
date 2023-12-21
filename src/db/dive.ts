@@ -85,25 +85,39 @@ export class DiveDB {
 
     async getDivesByUserId(userId: number): Promise<Dive[] | null> {
         try{
-            const result = await this.pool.query(`
-                SELECT * FROM dives WHERE user_id=$1
-            `, [userId]);
+            const pageSize = 10;
+            let currentPage = 1;
+            let hasMoreRecords = true;
+            let allTransformedDives : Dive [] = [];
+            
+            while (hasMoreRecords) {
+                const offset = (currentPage - 1) * pageSize;
 
-            const dives = result.rows;
+                const results = await this.pool.query(`
+                    SELECT * FROM dives 
+                        WHERE user_id=$1
+                        ORDER BY id
+                        LIMIT ${pageSize} OFFSET ${offset}
+                `, [userId]);
 
-             if(dives.length === 0){
-                return null;
+                const dives = results.rows;
+
+                if(dives.length < pageSize){
+                    hasMoreRecords = false;
+                }
+
+                let transformedDives: Dive[] = []; 
+
+                dives.forEach((dive) => {
+                    const transformedDive = this.transformDive(dive);
+                    allTransformedDives.push(transformedDive);
+                })
+
+                currentPage ++;
             }
 
-            let transformedDives: Dive[] = []; 
+            return allTransformedDives;
 
-            dives.forEach((dive) => {
-                const transformedDive = this.transformDive(dive);
-                transformedDives.push(transformedDive);
-            })
-
-            return transformedDives; 
-            
         } catch(error){
             console.error('Error in getDivesByUserId', error);
             throw error;
