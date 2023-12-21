@@ -27,4 +27,9 @@ export class DiveService {
         const updatedDive = await this.diveDB.updateDiveById(id, diveData);
         return updatedDive;
     }
+
+    async getDivesByUserId(userId: number): Promise<Dive[] | null> {
+        const dives = await this.diveDB.getDivesByUserId(userId);
+        return dives;
+    }
 }
