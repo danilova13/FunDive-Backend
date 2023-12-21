@@ -2,7 +2,7 @@
 export type Dive = {
     id: number;
     name: string;
-    date: Date;
+    date: string;
     description: string;
     duration: number;
     location: string;
@@ -11,7 +11,7 @@ export type Dive = {
 
 export type DiveForm = {
     name: string;
-    date: Date;
+    date: string;
     description: string;
     duration: number;
     location: string;

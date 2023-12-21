@@ -8,18 +8,19 @@ export class DiveDB {
         this.pool = pool;
     }
 
-    async saveDive(diveData: DiveForm): Promise<Dive> {
+    async saveDive(userId: number, diveData: DiveForm): Promise<Dive> {
         try{
             const result = await this.pool.query(
                 `INSERT INTO dives(
+                    user_id,
                     name,
                     date,
                     description,
                     duration,
                     location)
-                    VALUES($1, $2, $3, $4, $5)
+                    VALUES($1, $2, $3, $4, $5, $6)
                     RETURNING *
-                `,[diveData.name, diveData.date, diveData.description, diveData.duration, diveData.location]
+                `,[userId, diveData.name, diveData.date, diveData.description, diveData.duration, diveData.location]
             );
 
             const dive: Dive = this.transformDive(result.rows[0]);
