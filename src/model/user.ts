@@ -65,8 +65,7 @@ export function validateUserForm(userForm: UserForm, areFieldsRequired: Boolean)
         } else if(areFieldsRequired) {
             throw new Error("Please enter a name, name is required!")
         }
-        
-       
+          
         // validate last name 
         if (userForm.lastName) {
             if(userForm.lastName === ''){
