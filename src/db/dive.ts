@@ -83,40 +83,29 @@ export class DiveDB {
         }
     }
 
-    async getDivesByUserId(userId: number): Promise<Dive[] | null> {
+    async getDivesByUserId(userId: number, pageSize: number, offset: number): Promise<Dive[] | null> {
         try{
-            const pageSize = 10;
-            let currentPage = 1;
-            let hasMoreRecords = true;
-            let allTransformedDives : Dive [] = [];
-            
-            while (hasMoreRecords) {
-                const offset = (currentPage - 1) * pageSize;
+            const results = await this.pool.query(`
+                SELECT * FROM dives 
+                    WHERE user_id=$1
+                    ORDER BY id
+                    LIMIT $2 OFFSET $3
+            `, [userId, pageSize, offset]);
 
-                const results = await this.pool.query(`
-                    SELECT * FROM dives 
-                        WHERE user_id=$1
-                        ORDER BY id
-                        LIMIT ${pageSize} OFFSET ${offset}
-                `, [userId]);
+            const dives = results.rows;
 
-                const dives = results.rows;
-
-                if(dives.length < pageSize){
-                    hasMoreRecords = false;
-                }
-
-                let transformedDives: Dive[] = []; 
-
-                dives.forEach((dive) => {
-                    const transformedDive = this.transformDive(dive);
-                    allTransformedDives.push(transformedDive);
-                })
-
-                currentPage ++;
+            if(dives.length === 0){
+                return null;
             }
 
-            return allTransformedDives;
+            let transformedDives: Dive[] = []; 
+
+            dives.forEach((dive) => {
+                const transformedDive = this.transformDive(dive);
+                transformedDives.push(transformedDive);
+            })
+
+            return transformedDives;
 
         } catch(error){
             console.error('Error in getDivesByUserId', error);
