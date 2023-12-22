@@ -28,8 +28,8 @@ export class DiveService {
         return updatedDive;
     }
 
-    async getDivesByUserId(userId: number,  pageSize: number, offset: number): Promise<Dive[] | null> {
-        const dives = await this.diveDB.getDivesByUserId(userId, pageSize, offset);
+    async getDivesByUserId(userId: number,  limit: number, offset: number): Promise<Dive[] | null> {
+        const dives = await this.diveDB.getDivesByUserId(userId, limit, offset);
         return dives;
     }
 }

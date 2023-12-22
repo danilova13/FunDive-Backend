@@ -83,20 +83,16 @@ export class DiveDB {
         }
     }
 
-    async getDivesByUserId(userId: number, pageSize: number, offset: number): Promise<Dive[] | null> {
+    async getDivesByUserId(userId: number, limit: number, offset: number): Promise<Dive[] | null> {
         try{
             const results = await this.pool.query(`
                 SELECT * FROM dives 
                     WHERE user_id=$1
                     ORDER BY id
                     LIMIT $2 OFFSET $3
-            `, [userId, pageSize, offset]);
+            `, [userId, limit, offset]);
 
             const dives = results.rows;
-
-            if(dives.length === 0){
-                return null;
-            }
 
             let transformedDives: Dive[] = []; 
 
