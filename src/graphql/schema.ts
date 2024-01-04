@@ -4,6 +4,8 @@ export const typeDefs = gql(`
     type Query {
         health: String
         getUserById (id: Int!): User
+        getDiveById (id: Int!): Dive
+        getDivesByUserId (userId: Int!, limit: Int!, offset: Int!): Dive
     }
 
     type User {
@@ -24,12 +26,30 @@ export const typeDefs = gql(`
         auth: Auth
     }
 
+    type Dive {
+        id: Int!
+        name: String!
+        date: String!
+        description: String!
+        duration: Int!
+        location: String!
+        userId: Int!
+    }
+
     input UserPatch {
         email: String, 
         firstName: String,
         lastName: String,
         phone: String,
         password: String
+    }
+
+    input DivePatch {
+        name: String!
+        date: String!
+        description: String!
+        duration: Int!
+        location: String!
     }
 
     type Mutation {
@@ -50,5 +70,22 @@ export const typeDefs = gql(`
             email: String!,
             password: String!
         ): AuthenticationPayload!
+
+        createDive(
+            name: String!
+            date: String!
+            description: String!
+            duration: Int!
+            location: String!
+        ): Dive
+
+        updateDiveById(
+            id: Int!
+            patch: DivePatch!
+        ): Dive
+
+        deleteDiveById(
+            id: Int!
+        ): Int!
     }
 `);

@@ -1,10 +1,12 @@
 import { ApolloServer, gql } from "apollo-server-express";
 import { UserService } from "../services/userService";
 import { UserForm, LoginForm } from "../model/user";
+import { DiveService } from "../services/diveService";
 
 
 export const buildResolvers = (
     userService: UserService,
+    diveService: DiveService
 ) => ({
     Query: {
         health: () => 'Hello healthy web!',
@@ -24,7 +26,39 @@ export const buildResolvers = (
         
                 const user = await userService.getUserById(id);
                 return user;
+            },
+        
+        // resolver that gets a dive by dive id
+        getDiveById: async(parent: any, args: any, context: any) => {
+                if(!context.user) {
+                    throw new Error("You have to be logged in to get a dive!")
+                }
+
+                const { id } = args;
+
+                // permissions for accessing a dive
+                if(context.dive.id !== id) {
+                    throw new Error("You can't access this dive!");
+                }
+
+                const dive = await diveService.getDiveById(id);
+            },
+
+        getDivesByUserId: async(parent: any, args: any, context: any) => {
+                if(!context.user) {
+                    throw new Error("You have to be logged in to get dives!")
+                }
+
+                const { userId, limit, offset } = args;
+
+                // permissions for accessing dives 
+                if(context.dive.userId !== userId){
+                    throw new Error("You can't access these dives!")
+                }
+
+                const dives = await diveService.getDivesByUserId(userId, limit, offset);
             }
+
         },
 
     Mutation: {
