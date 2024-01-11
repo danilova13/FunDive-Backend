@@ -2,7 +2,7 @@ import { ApolloServer, gql } from "apollo-server-express";
 import { UserService } from "../services/userService";
 import { UserForm, LoginForm } from "../model/user";
 import { DiveService } from "../services/diveService";
-
+import { DiveForm } from "../model/dive";
 
 export const buildResolvers = (
     userService: UserService,
@@ -37,11 +37,13 @@ export const buildResolvers = (
                 const { id } = args;
 
                 // permissions for accessing a dive
-                if(context.dive.id !== id) {
+                if(args.id !== id) {
                     throw new Error("You can't access this dive!");
                 }
 
                 const dive = await diveService.getDiveById(id);
+
+                return dive;
             },
 
         getDivesByUserId: async(parent: any, args: any, context: any) => {
@@ -52,11 +54,13 @@ export const buildResolvers = (
                 const { userId, limit, offset } = args;
 
                 // permissions for accessing dives 
-                if(context.dive.userId !== userId){
+                if(args.userId !== userId){
                     throw new Error("You can't access these dives!")
                 }
 
                 const dives = await diveService.getDivesByUserId(userId, limit, offset);
+
+                return dives;
             }
 
         },
@@ -76,7 +80,7 @@ export const buildResolvers = (
                 password: args.password
             }
         
-            return userService.createUser(userForm)
+            return userService.createUser(userForm);
         },
         
         // resolver that updates user by id
@@ -118,5 +122,57 @@ export const buildResolvers = (
     
             return userService.loginUser(loginForm);
         },
+
+        createDive: async (parent: any, args: any, context: any) => {
+            if (!context.user) {
+                throw new Error("You have to be logged in to create a dive!");
+            }
+
+            const diveForm: DiveForm = {
+                name: args.name,
+                date: args.date,
+                description: args.description,
+                duration: args.duration,
+                location: args.location
+            }
+
+            return diveService.createDive(context.user.userId, diveForm);
+        },
+
+        updateDiveById: async (parent: any, args: any, context: any) => {
+            if (!context.user) {
+                throw new Error("You have to be logged in to update dives!");
+            }
+
+            const { id, patch } = args;
+
+            if (args.id !== id) {
+                throw new Error("You can't update this dive!");
+            }
+
+            const diveForm: DiveForm = {
+                name: patch.name,
+                date: patch.date,
+                description: patch.description,
+                duration: patch.duration,
+                location: patch.location
+            }
+
+            return diveService.updateDiveById(id, diveForm);
+        },
+
+        deleteDiveById: async (parent: any, args: any, context: any) => {
+            if(!context.user){
+                throw new Error("You have to be logged in to delete dives!");
+            }
+
+            const { id } = args;
+
+            if (args.id !== id) {
+                throw new Error("You can't delete this dive!");
+            }
+
+            return diveService.deleteDiveById(id);
+        }
     }
 });

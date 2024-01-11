@@ -5,7 +5,7 @@ export const typeDefs = gql(`
         health: String
         getUserById (id: Int!): User
         getDiveById (id: Int!): Dive
-        getDivesByUserId (userId: Int!, limit: Int!, offset: Int!): Dive
+        getDivesByUserId (userId: Int!, limit: Int!, offset: Int!): [Dive]
     }
 
     type User {
@@ -45,11 +45,11 @@ export const typeDefs = gql(`
     }
 
     input DivePatch {
-        name: String!
-        date: String!
-        description: String!
-        duration: Int!
-        location: String!
+        name: String,
+        date: String,
+        description: String,
+        duration: Int,
+        location: String
     }
 
     type Mutation {
