@@ -148,10 +148,6 @@ export const buildResolvers = (
 
             const { id, patch } = args;
 
-            if (args.id !== id) {
-                throw new Error("You can't update this dive!");
-            }
-
             const diveForm: DiveForm = {
                 name: patch.name,
                 date: patch.date,
@@ -160,7 +156,17 @@ export const buildResolvers = (
                 location: patch.location
             }
 
-            return diveService.updateDiveById(id, diveForm);
+            const updatedDive = await diveService.updateDiveById(id, diveForm);
+
+            if(!updatedDive) {
+                return null;
+            }
+
+            if (updatedDive.userId !== context.user.userId) {
+                throw new Error("You can't access this dive!");
+            }
+
+            return updatedDive;
         },
 
         deleteDiveById: async (parent: any, args: any, context: any) => {
@@ -170,11 +176,19 @@ export const buildResolvers = (
 
             const { id } = args;
 
-            if (args.id !== id) {
-                throw new Error("You can't delete this dive!");
+            // to check if the userId of the person logged in matches the userId of the dive to be deleted
+            // get the dive before deleting it 
+            const dive = await diveService.getDiveById(id);
+            if(!dive) {
+                return null
             }
 
-            return diveService.deleteDiveById(id);
+            if (dive.userId !== context.user.userId) {
+                throw new Error("You can't delete this dive!")
+            }
+            
+            const deletedDive = await diveService.deleteDiveById(id);
+            return deletedDive;
         }
     }
 });
