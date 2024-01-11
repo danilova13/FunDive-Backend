@@ -35,13 +35,17 @@ export const buildResolvers = (
                 }
 
                 const { id } = args;
+                const dive = await diveService.getDiveById(id);
 
-                // permissions for accessing a dive
-                if(args.id !== id) {
-                    throw new Error("You can't access this dive!");
+                if (!dive) {
+                    return null;
                 }
 
-                const dive = await diveService.getDiveById(id);
+                // permissions: if userId on this dive isn't the same one as the id of logged in user
+                // can't access the dive 
+                if(dive.userId !== context.user.userId) {
+                    throw new Error("You can't access this dive!");
+                }
 
                 return dive;
             },
@@ -52,13 +56,18 @@ export const buildResolvers = (
                 }
 
                 const { userId, limit, offset } = args;
+                const dives = await diveService.getDivesByUserId(userId, limit, offset);
 
-                // permissions for accessing dives 
-                if(args.userId !== userId){
-                    throw new Error("You can't access these dives!")
+                if(!dives) {
+                    return null;
                 }
 
-                const dives = await diveService.getDivesByUserId(userId, limit, offset);
+                // check if userId on these dives matches the userId of the person logged in
+                dives.forEach((dive) => {
+                    if(dive.userId !== context.user.userId) {
+                        throw new Error("You can't access these dives!");
+                    }
+                })
 
                 return dives;
             }
