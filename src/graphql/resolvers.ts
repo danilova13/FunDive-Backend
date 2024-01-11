@@ -56,19 +56,12 @@ export const buildResolvers = (
                 }
 
                 const { userId, limit, offset } = args;
-                const dives = await diveService.getDivesByUserId(userId, limit, offset);
 
-                if(!dives) {
-                    return null;
+                if (userId !== context.user.userId) {
+                    throw new Error("You can't access these dives!");
                 }
 
-                // check if userId on these dives matches the userId of the person logged in
-                dives.forEach((dive) => {
-                    if(dive.userId !== context.user.userId) {
-                        throw new Error("You can't access these dives!");
-                    }
-                })
-
+                const dives = await diveService.getDivesByUserId(userId, limit, offset);
                 return dives;
             }
 
