@@ -14,7 +14,7 @@ export class DiveService {
         return newDive;
     }
 
-    async getDiveById(id: number): Promise<Dive | null> {
+    async getDiveById(id: number): Promise<Dive | null > {
         const dive = await this.diveDB.getDiveById(id);
         return dive;
     }

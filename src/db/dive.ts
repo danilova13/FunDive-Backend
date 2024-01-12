@@ -1,5 +1,6 @@
 import { Pool } from 'pg';
 import { DiveForm, Dive } from '../model/dive';
+import { getFieldValues } from './helpers';
 
 export class DiveDB {
     pool: Pool; 
