@@ -408,6 +408,52 @@ describe('Integration tests for resolvers', () => {
                     expect(response.body.data.createUser.user.phone).toEqual(phone);   
                 })
         });
+        
+        it('should return Logged in users cannot creat a new account!', async () => {
+            // creating userForm
+            const user = createTestUserData();
+            const savedUser = await db.saveUser(user);
+            const phone = '+14168990465';
+
+            const createUserMutation = `
+                mutation createUser {
+                    createUser(
+                        email: "${user.email}", 
+                        firstName: "${user.firstName}", 
+                        lastName: "${user.lastName}", 
+                        phone: "${phone}", 
+                        password: "${user.password}"
+                    ) {
+                        user {
+                            firstName
+                            lastName
+                            phone
+                            email
+                            password
+                            id
+                        }
+                        auth {
+                            jwtToken
+                        }
+                    }
+                }
+            `
+    
+            const jwtToken = jwtGenerator(savedUser.id);
+
+            await request(app)
+                .post('/graphql')
+                .send({
+                    query: createUserMutation
+                })
+                .set('Authorization', `Bearer ${jwtToken}`)
+                .expect(200)
+                .then(response => {
+                    expect(response.body.errors).toBeDefined();
+                    expect(response.body.errors[0].message).toEqual("Logged-in users cannot create a new account!");   
+                })
+
+        });
     })
 
 })
