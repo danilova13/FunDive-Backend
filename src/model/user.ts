@@ -1,5 +1,5 @@
 import * as EmailValidator from 'email-validator';
-import { isValidPhoneNumber } from 'libphonenumber-js/min';
+import { CountryCode, PhoneNumber, isValidPhoneNumber, parsePhoneNumberWithError } from 'libphonenumber-js/min';
 
 
 export type User = {
@@ -40,7 +40,6 @@ export type JWTPayload = {
 export function validateUserForm(userForm: UserForm, areFieldsRequired: Boolean): UserForm {
         // if the email is in the form, validate email
         if (userForm.email) {
-
             if(!EmailValidator.validate(userForm.email)){
                 throw new Error('This email is not valid, please enter a valid email!');
             }
@@ -50,7 +49,9 @@ export function validateUserForm(userForm: UserForm, areFieldsRequired: Boolean)
 
         // if phone number is in the form validate phone number 
         if (userForm.phone) {
-            if(!isValidPhoneNumber(userForm.phone)){
+            const parsedNumber = parsePhone(userForm.phone);
+
+            if(!isValidPhoneNumber(parsedNumber)){
                 throw new Error('This phone number is not valid, please enter a valid number!');
             }
         } else if(areFieldsRequired) {
@@ -76,4 +77,18 @@ export function validateUserForm(userForm: UserForm, areFieldsRequired: Boolean)
         }
        
         return userForm;
+}
+
+// helper function that parses phone numbers
+function parsePhone(phoneNumber: string) {
+    // remove extra + and any characters that are not numbers
+    let correctPhoneNum = phoneNumber.substring(phoneNumber.lastIndexOf('+')).replace(/[^0-9\\+]/g, '');
+
+    // if num more than 10, ie non-North American num, and there is no + in front, append + to it
+    if (correctPhoneNum.length > 10 && phoneNumber[0] !== '+') {
+        correctPhoneNum = `+${phoneNumber}`;
+    }
+
+    // otherwise use parsePhone num function 
+    return parsePhoneNumberWithError(correctPhoneNum, 'US').formatInternational();
 }

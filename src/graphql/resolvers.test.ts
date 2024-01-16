@@ -7,12 +7,15 @@ import request from 'supertest';
 import type { Express } from "express";
 import { jwtGenerator } from "../auth/jwtGenerator";
 import { DiveDB } from "../db/dive";
+import { UserService } from "../services/userService";
+import bcrypt from 'bcrypt';
 
 describe('Integration tests for resolvers', () => {
     let pool: Pool;
     let db: UserDB; 
     let diveDb: DiveDB;
     let app: Express;
+    let userService: UserService;
 
     // initiate db and start app before running all tests
     beforeAll(async () => {
@@ -58,7 +61,7 @@ describe('Integration tests for resolvers', () => {
         }
     }
 
-    describe('getUserById', () => {
+    describe('getUserById query', () => {
         it('should return a user with a specified id when the user is logged in', async () => {
             // creates and saves test user to db
             const user = await db.saveUser(createTestUserData());
@@ -143,7 +146,7 @@ describe('Integration tests for resolvers', () => {
         });
     });
 
-    describe('getDiveById', () => {
+    describe('getDiveById query', () => {
         it('should return a dive with a specified id when the user is logged in', async () => {
             // save user to db
             const user = await db.saveUser(createTestUserData());
@@ -242,7 +245,7 @@ describe('Integration tests for resolvers', () => {
         });
     });
 
-    describe('getDivesByUserId', () => {
+    describe('getDivesByUserId query', () => {
         it('should return dives for a user with a specified id, when user is logged in', async () => {
             // save user to db
             const user = await db.saveUser(createTestUserData());
@@ -283,7 +286,128 @@ describe('Integration tests for resolvers', () => {
                     expect(response.body.data.getDivesByUserId).toEqual(dbDives);
                 })
         }); 
-    })
 
+        it('should return You have to be logged in to get dives', async () => {
+            // save user to db
+            const user = await db.saveUser(createTestUserData());
+            // create and save dives to db 
+            const dive1 = await diveDb.saveDive(user.id, createTestDiveData());
+            const dive2 = await diveDb.saveDive(user.id, createTestDiveData());
+
+            // select all the saved dives from the database for this user
+            const dbDives = await diveDb.getDivesByUserId(user.id, 10, 0);
+
+            const getDivesForUserQuery = `
+                query getDivesByUserId {
+                    getDivesByUserId(userId: ${user.id}, limit: 10, offset: 0) {
+                        name
+                        location
+                        description
+                        duration
+                        id
+                        userId
+                        date
+                    }
+                }
+            `
+
+            await request(app)
+                .post('/graphql')
+                .send({
+                    query: getDivesForUserQuery
+                })
+                .expect(200)
+                .then(response => {
+                    expect(response.body.errors).toBeDefined();
+                    expect(response.body.errors[0].message).toEqual("You have to be logged in to get dives!");
+                })
+        });
+
+        it('should return You cant access this dives if incorrect user is trying to access the dives', async () => {
+                // save user to db
+                const user = await db.saveUser(createTestUserData());
+                const user1 = await db.saveUser(createTestUserData());
+                // create and save dives to db 
+                const dive1 = await diveDb.saveDive(user.id, createTestDiveData());
+                const dive2 = await diveDb.saveDive(user.id, createTestDiveData());
+    
+                // select all the saved dives from the database for this user
+                const dbDives = await diveDb.getDivesByUserId(user.id, 10, 0);
+    
+                const getDivesForUserQuery = `
+                    query getDivesByUserId {
+                        getDivesByUserId(userId: ${user.id}, limit: 10, offset: 0) {
+                            name
+                            location
+                            description
+                            duration
+                            id
+                            userId
+                            date
+                        }
+                    }
+                `
+                const jwtToken = jwtGenerator(user1.id);
+
+                await request(app)
+                    .post('/graphql')
+                    .send({
+                        query: getDivesForUserQuery
+                    })
+                    .set('Authorization', `Bearer ${jwtToken}`)
+                    .expect(200)
+                    .then(response => {
+                        expect(response.body.errors).toBeDefined();
+                        expect(response.body.errors[0].message).toEqual("You can't access these dives!");
+                    })
+        })
+
+    });
+
+    describe('createUser mutation', () => {
+        it('should create a new user if user hasnt been created yet', async () => {
+            // creating userForm
+            const user = createTestUserData();
+            const phone = '+14168990465';
+
+            const createUserMutation = `
+                mutation createUser {
+                    createUser(
+                        email: "${user.email}", 
+                        firstName: "${user.firstName}", 
+                        lastName: "${user.lastName}", 
+                        phone: "${phone}", 
+                        password: "${user.password}"
+                    ) {
+                        user {
+                            firstName
+                            lastName
+                            phone
+                            email
+                            password
+                            id
+                        }
+                        auth {
+                            jwtToken
+                        }
+                    }
+                }
+            `
+    
+            await request(app)
+                .post('/graphql')
+                .send({
+                    query: createUserMutation
+                })
+                .expect(200)
+                .then(response => {
+                    expect(response.body.errors).toBeUndefined();
+                    expect(response.body.data.createUser.user.firstName).toEqual(user.firstName); 
+                    expect(response.body.data.createUser.user.lastName).toEqual(user.lastName);
+                    expect(response.body.data.createUser.user.email).toEqual(user.email); 
+                    expect(response.body.data.createUser.user.phone).toEqual(phone);   
+                })
+        });
+    })
 
 })
