@@ -29,7 +29,7 @@ async function NewApp() {
         res.status(200).json("All good in da hood!!!");
     })
 
-    return app;
+    return { app, pool };
 }
 
 export { NewApp };

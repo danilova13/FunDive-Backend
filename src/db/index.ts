@@ -8,11 +8,7 @@ import type {
 export async function initiateDB() {
     
     const pool = new Pool({
-        user: process.env.POSTGRES_USER,
-        host: 'database',
-        database: process.env.POSTGRES_DB,
-        password: process.env.POSTGRES_PASSWORD,
-        port: 5432,
+        connectionString: process.env.DATABASE_URL,
         max: 10,
         connectionTimeoutMillis: 20000,
         idleTimeoutMillis: 20000,

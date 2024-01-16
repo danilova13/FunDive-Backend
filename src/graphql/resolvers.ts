@@ -12,60 +12,57 @@ export const buildResolvers = (
         health: () => 'Hello healthy web!',
         // resolver that gets user by Id
         getUserById: async(parent:any, args: any, context: any) => {
-                if(!context.user) {
-                    throw new Error("You have to be logged in to get a user!")
-                }
-                const { id } = args;
-
-                console.log(id);
-                console.log(context.user.userId);
-                // permissions 
-                if(context.user.userId !== id) {
-                    throw new Error("You can't access this user!")
-                }
-        
-                const user = await userService.getUserById(id);
-                return user;
-            },
+            if(!context.user) {
+                throw new Error("You have to be logged in to get a user!")
+            }
+            const { id } = args;
+            // permissions 
+            if(context.user.userId !== id) {
+                throw new Error("You can't access this user!")
+            }
+    
+            const user = await userService.getUserById(id);
+            return user;
+        },
         
         // resolver that gets a dive by dive id
         getDiveById: async(parent: any, args: any, context: any) => {
-                if(!context.user) {
-                    throw new Error("You have to be logged in to get a dive!")
-                }
-
-                const { id } = args;
-                const dive = await diveService.getDiveById(id);
-
-                if (!dive) {
-                    return null;
-                }
-
-                // permissions: if userId on this dive isn't the same one as the id of logged in user
-                // can't access the dive 
-                if(dive.userId !== context.user.userId) {
-                    throw new Error("You can't access this dive!");
-                }
-
-                return dive;
-            },
-
-        getDivesByUserId: async(parent: any, args: any, context: any) => {
-                if(!context.user) {
-                    throw new Error("You have to be logged in to get dives!")
-                }
-
-                const { userId, limit, offset } = args;
-
-                if (userId !== context.user.userId) {
-                    throw new Error("You can't access these dives!");
-                }
-
-                const dives = await diveService.getDivesByUserId(userId, limit, offset);
-                return dives;
+            if(!context.user) {
+                throw new Error("You have to be logged in to get a dive!")
             }
 
+            const { id } = args;
+            const dive = await diveService.getDiveById(id);
+
+            if (!dive) {
+                return null;
+            }
+
+            // permissions: if userId on this dive isn't the same one as the id of logged in user
+            // can't access the dive 
+            if(dive.userId !== context.user.userId) {
+                throw new Error("You can't access this dive!");
+            }
+
+            return dive;
         },
+
+        getDivesByUserId: async(parent: any, args: any, context: any) => {
+            if(!context.user) {
+                throw new Error("You have to be logged in to get dives!")
+            }
+
+            const { userId, limit, offset } = args;
+
+            if (userId !== context.user.userId) {
+                throw new Error("You can't access these dives!");
+            }
+
+            const dives = await diveService.getDivesByUserId(userId, limit, offset);
+            return dives;
+        }
+
+    },
 
     Mutation: {
         // resolver that creates user

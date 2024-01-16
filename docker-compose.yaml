@@ -29,12 +29,12 @@ services:
     image: postgres:16
     container_name: fundive_postgres
     environment:
-      - POSTGRES_DB
       - POSTGRES_USER
       - POSTGRES_PASSWORD
-      - DATABASE_URL
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+
     ports:
       - "5433:5432"
   
