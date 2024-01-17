@@ -20,7 +20,7 @@ export class UserService {
             const cost = 10; 
             const hash = await bcrypt.hash(userForm.password, cost);
 
-             // build user
+            // build user
              const user: UserForm = {
                 email: userForm.email,
                 lastName: userForm.lastName,

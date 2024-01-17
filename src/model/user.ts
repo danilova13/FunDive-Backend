@@ -1,5 +1,5 @@
 import * as EmailValidator from 'email-validator';
-import { isValidPhoneNumber } from 'libphonenumber-js/min';
+import {  isValidPhoneNumber } from 'libphonenumber-js/min';
 
 
 export type User = {
@@ -40,7 +40,6 @@ export type JWTPayload = {
 export function validateUserForm(userForm: UserForm, areFieldsRequired: Boolean): UserForm {
         // if the email is in the form, validate email
         if (userForm.email) {
-
             if(!EmailValidator.validate(userForm.email)){
                 throw new Error('This email is not valid, please enter a valid email!');
             }

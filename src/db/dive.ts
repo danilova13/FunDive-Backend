@@ -111,10 +111,11 @@ export class DiveDB {
     }
 
     transformDive(dbDive: Record<string, any>): Dive {
+        const newDate = new Date(dbDive.date).toISOString();
         const dive: Dive = {
             id: dbDive.id,
             name: dbDive.name,
-            date: dbDive.date,
+            date: newDate,
             description: dbDive.description,
             duration: dbDive.duration,
             location: dbDive.location,
