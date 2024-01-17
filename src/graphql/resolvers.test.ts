@@ -46,7 +46,7 @@ describe('Integration tests for resolvers', () => {
             email: faker.internet.email(),
             firstName: faker.person.firstName(),
             lastName: faker.person.lastName(),
-            phone: faker.phone.number(),
+            phone: '+14169990000',
             password: faker.internet.password()
         }
     }
@@ -368,7 +368,6 @@ describe('Integration tests for resolvers', () => {
         it('should create a new user if user hasnt been created yet', async () => {
             // creating userForm
             const user = createTestUserData();
-            const phone = '+14168990465';
 
             const createUserMutation = `
                 mutation createUser {
@@ -376,7 +375,7 @@ describe('Integration tests for resolvers', () => {
                         email: "${user.email}", 
                         firstName: "${user.firstName}", 
                         lastName: "${user.lastName}", 
-                        phone: "${phone}", 
+                        phone: "${user.phone}", 
                         password: "${user.password}"
                     ) {
                         user {
@@ -405,13 +404,14 @@ describe('Integration tests for resolvers', () => {
                     expect(response.body.data.createUser.user.firstName).toEqual(user.firstName); 
                     expect(response.body.data.createUser.user.lastName).toEqual(user.lastName);
                     expect(response.body.data.createUser.user.email).toEqual(user.email); 
-                    expect(response.body.data.createUser.user.phone).toEqual(phone);   
+                    expect(response.body.data.createUser.user.phone).toEqual(user.phone);   
                 })
         });
         
         it('should return Logged in users cannot creat a new account!', async () => {
             // creating userForm
             const user = createTestUserData();
+            // saving user to db
             const savedUser = await db.saveUser(user);
             const phone = '+14168990465';
 
@@ -452,8 +452,332 @@ describe('Integration tests for resolvers', () => {
                     expect(response.body.errors).toBeDefined();
                     expect(response.body.errors[0].message).toEqual("Logged-in users cannot create a new account!");   
                 })
+        });
 
+        it('should return Validation error when wrong email is entered', async () => {
+            const user = createTestUserData();
+            const email = 'test.gmail.com';
+
+            const createUserMutation = `
+                mutation createUser {
+                    createUser(
+                        email: "${email}", 
+                        firstName: "${user.firstName}", 
+                        lastName: "${user.lastName}", 
+                        phone: "${user.phone}", 
+                        password: "${user.password}"
+                    ) {
+                        user {
+                            firstName
+                            lastName
+                            phone
+                            email
+                            password
+                            id
+                        }
+                        auth {
+                            jwtToken
+                        }
+                    }
+                }
+            `
+
+            await request(app)
+                .post('/graphql')
+                .send({
+                    query: createUserMutation
+                })
+                .expect(200)
+                .then(response => {
+                    expect(response.body.errors).toBeDefined();
+                    expect(response.body.errors[0].message).toEqual("This email is not valid, please enter a valid email!"); 
+                })
+        });
+
+        it('should return Validation error when wrong phone number is entered', async () => {
+            const user = createTestUserData();
+            const phone = '1234';
+
+            const createUserMutation = `
+                mutation createUser {
+                    createUser(
+                        email: "${user.email}", 
+                        firstName: "${user.firstName}", 
+                        lastName: "${user.lastName}", 
+                        phone: "${phone}", 
+                        password: "${user.password}"
+                    ) {
+                        user {
+                            firstName
+                            lastName
+                            phone
+                            email
+                            password
+                            id
+                        }
+                        auth {
+                            jwtToken
+                        }
+                    }
+                }
+            `
+
+            await request(app)
+                .post('/graphql')
+                .send({
+                    query: createUserMutation
+                })
+                .expect(200)
+                .then(response => {
+                    expect(response.body.errors).toBeDefined();
+                    expect(response.body.errors[0].message).toEqual("This phone number is not valid, please enter a valid number!"); 
+                })
+        })
+    });
+
+    describe('updateUserById mutation', () => {
+        it('should update a user if user is logged in', async () => {
+            const user = await db.saveUser(createTestUserData());
+
+            const updateUserMutation = `
+                mutation updateUser {
+                    updateUserById(
+                        id: ${user.id},
+                        patch: {
+                            firstName: "${user.firstName}"
+                        } 
+                    ) {
+                        id
+                        firstName
+                    }
+                }
+            `
+            const jwtToken = jwtGenerator(user.id);
+
+            await request(app)
+                .post('/graphql')
+                .send({
+                    query: updateUserMutation
+                })
+                .set('Authorization', `Bearer ${jwtToken}`)
+                .expect(200)
+                .then(response => {
+                    expect(response.body.errors).toBeUndefined();
+                    expect(response.body.data.updateUserById.firstName).toEqual(user.firstName);
+            });
+        });
+
+        it('should return an error You have to be logged in to update if user is not logged in', async () => {
+            const user = await db.saveUser(createTestUserData());
+
+            const updateUserMutation = `
+                mutation updateUser {
+                    updateUserById(
+                        id: ${user.id},
+                        patch: {
+                            firstName: "${user.firstName}"
+                        } 
+                    ) {
+                        id
+                        firstName
+                    }
+                }
+            `
+
+            await request(app)
+                .post('/graphql')
+                .send({
+                    query: updateUserMutation
+                })
+                .expect(200)
+                .then(response => {
+                    expect(response.body.errors).toBeDefined();
+                    expect(response.body.errors[0].message).toEqual("You have to be logged in to update!");
+            });
+        });
+
+        it('should return an error You cannot update this user if provided user id is incorrect', async () => {
+            const user = await db.saveUser(createTestUserData());
+            const user1 = await db.saveUser(createTestUserData());
+
+            const updateUserMutation = `
+                mutation updateUser {
+                    updateUserById(
+                        id: ${user.id},
+                        patch: {
+                            firstName: "${user.firstName}"
+                        } 
+                    ) {
+                        id
+                        firstName
+                    }
+                }
+            `
+            
+            const jwtToken = jwtGenerator(user1.id);
+
+            await request(app)
+                .post('/graphql')
+                .send({
+                    query: updateUserMutation
+                })
+                .set('Authorization', `Bearer ${jwtToken}`)
+                .expect(200)
+                .then(response => {
+                    expect(response.body.errors).toBeDefined();
+                    expect(response.body.errors[0].message).toEqual("You can't update this user!");
+            });
+        });
+
+    });
+
+    describe('loginUser mutation', () => {
+        it('should login user if the user is not already logged in', async () => {
+            const userData = createTestUserData();
+            // save unhashed password 
+            const password = userData.password;
+            // hash the password to be saved in db
+            const hashedPassword = await bcrypt.hash(userData.password, 10);
+            userData.password = hashedPassword;
+
+            const user = await db.saveUser(userData);
+
+            const loginUserMutation = `
+                mutation loginUser {
+                    loginUser(email: "${user.email}", password: "${password}") {
+                        user {
+                            email
+                            password
+                            id
+                        }
+                    
+                        auth {
+                            jwtToken
+                        }
+                    }
+                }
+            `
+
+            await request(app)
+                .post('/graphql')
+                .send({
+                    query: loginUserMutation
+                })
+                .expect(200)
+                .then(response => {
+                    expect(response.body.errors).toBeUndefined();
+                    expect(response.body.data.loginUser.user.email).toEqual(user.email); 
+                })
+        });
+
+        it('should return an error You are already logged in, if user is logged in', async () => {
+            const userData = createTestUserData();
+            // save unhashed password 
+            const password = userData.password;
+            // hash the password to be saved in db
+            const hashedPassword = await bcrypt.hash(userData.password, 10);
+            userData.password = hashedPassword;
+
+            const user = await db.saveUser(userData);
+
+            const loginUserMutation = `
+                mutation loginUser {
+                    loginUser(email: "${user.email}", password: "${password}") {
+                        user {
+                            email
+                            password
+                            id
+                        }
+                    
+                        auth {
+                            jwtToken
+                        }
+                    }
+                }
+            `
+
+            const jwtToken = jwtGenerator(user.id);
+
+            await request(app)
+                .post('/graphql')
+                .send({
+                    query: loginUserMutation
+                })
+                .set('Authorization', `Bearer ${jwtToken}`)
+                .expect(200)
+                .then(response => {
+                    expect(response.body.errors).toBeDefined();
+                    expect(response.body.errors[0].message).toEqual('You are already logged in!'); 
+                })
+        })
+    });
+
+    describe('createDive mutation', () => {
+        it('should create dive when the user is logged in', async () => {
+            const user = await db.saveUser(createTestUserData());
+            const dive = createTestDiveData();
+
+            const createDiveMutation = `
+                mutation createDive {
+                    createDive(
+                        name: "${dive.name}", 
+                        date: "${dive.date}", 
+                        description: "${dive.description}", 
+                        duration: ${dive.duration}, 
+                        location: "${dive.location}"
+                    ) {
+                        name 
+                        location
+                        description
+                    }
+                }
+            `
+
+            const jwtToken = jwtGenerator(user.id);
+
+            await request(app)
+                .post('/graphql')
+                .send({
+                    query: createDiveMutation
+                })
+                .set('Authorization', `Bearer ${jwtToken}`)
+                .expect(200)
+                .then(response => {
+                    expect(response.body.errors).toBeUndefined();
+                    expect(response.body.data.createDive.name).toEqual(dive.name); 
+                    expect(response.body.data.createDive.description).toEqual(dive.description);
+                })
+        });
+
+        it('should return You have to be logged in to create a dive, if user is not logged in', async () => {
+            const dive = createTestDiveData();
+
+            const createDiveMutation = `
+                mutation createDive {
+                    createDive(
+                        name: "${dive.name}", 
+                        date: "${dive.date}", 
+                        description: "${dive.description}", 
+                        duration: ${dive.duration}, 
+                        location: "${dive.location}"
+                    ) {
+                        name 
+                        location
+                        description
+                    }
+                }
+            `
+
+            await request(app)
+                .post('/graphql')
+                .send({
+                    query: createDiveMutation
+                })
+                .expect(200)
+                .then(response => {
+                    expect(response.body.errors).toBeDefined();
+                    expect(response.body.errors[0].message).toEqual("You have to be logged in to create a dive!"); 
+                })
         });
     })
-
 })
