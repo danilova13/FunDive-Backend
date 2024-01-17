@@ -168,7 +168,7 @@ export const buildResolvers = (
 
         deleteDiveById: async (parent: any, args: any, context: any) => {
             if(!context.user){
-                throw new Error("You have to be logged in to delete dives!");
+                throw new Error("You have to be logged in to delete this dive!");
             }
 
             const { id } = args;

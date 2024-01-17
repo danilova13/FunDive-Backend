@@ -19,8 +19,9 @@ export class DiveService {
         return dive;
     }
 
-    async deleteDiveById(id: number): Promise<void> {
+    async deleteDiveById(id: number): Promise<number> {
         const diveDeleted = await this.diveDB.deleteDiveById(id);
+        return id;
     }
 
     async updateDiveById(id: number, diveData: DiveForm): Promise<Dive | null> {

@@ -544,11 +544,13 @@ describe('Integration tests for resolvers', () => {
                     updateUserById(
                         id: ${user.id},
                         patch: {
-                            firstName: "${user.firstName}"
+                            firstName: "Anya",
+                            lastName: "Danilova"
                         } 
                     ) {
                         id
                         firstName
+                        lastName
                     }
                 }
             `
@@ -563,7 +565,8 @@ describe('Integration tests for resolvers', () => {
                 .expect(200)
                 .then(response => {
                     expect(response.body.errors).toBeUndefined();
-                    expect(response.body.data.updateUserById.firstName).toEqual(user.firstName);
+                    expect(response.body.data.updateUserById.firstName).toEqual("Anya");
+                    expect(response.body.data.updateUserById.lastName).toEqual("Danilova");
             });
         });
 
@@ -575,7 +578,7 @@ describe('Integration tests for resolvers', () => {
                     updateUserById(
                         id: ${user.id},
                         patch: {
-                            firstName: "${user.firstName}"
+                            firstName: "Anya"
                         } 
                     ) {
                         id
@@ -779,5 +782,206 @@ describe('Integration tests for resolvers', () => {
                     expect(response.body.errors[0].message).toEqual("You have to be logged in to create a dive!"); 
                 })
         });
+    })
+
+    describe('updateDiveById mutation', () => {
+        it('should update dive by its id when the user is logged in', async () => {
+            const user = await db.saveUser(createTestUserData());
+            const dive = await diveDb.saveDive(user.id, createTestDiveData());
+
+            const updateDiveMutation = `
+                mutation updateDive {
+                    updateDiveById(
+                        id: ${dive.id}, 
+                        patch: {
+                            name: "Dive2",
+                            date: "${dive.date}",
+                            description: "${dive.description}", 
+                            duration: 30,
+                            location: "${dive.location}"
+                        }
+                    ) {
+                        name
+                        date
+                        description
+                        duration 
+                        location
+                    }
+                }
+            `
+
+            const jwtToken = jwtGenerator(user.id);
+
+            await request(app)
+                .post('/graphql')
+                .send({
+                    query: updateDiveMutation
+                })
+                .set('Authorization', `Bearer ${jwtToken}`)
+                .expect(200)
+                .then(response => {
+                    expect(response.body.errors).toBeUndefined();
+                    expect(response.body.data.updateDiveById.name).toEqual("Dive2"); 
+                    expect(response.body.data.updateDiveById.location).toEqual(dive.location);
+                    expect(response.body.data.updateDiveById.duration).toEqual(30);
+    
+                })
+
+        });
+
+        it('should return error You have to be logged in to update dives, if user is not logged in', async () => {
+            const user = await db.saveUser(createTestUserData());
+            const dive = await diveDb.saveDive(user.id, createTestDiveData());
+
+            const updateDiveMutation = `
+                mutation updateDive {
+                    updateDiveById(
+                        id: ${dive.id}, 
+                        patch: {
+                            name: "Dive2",
+                            date: "${dive.date}",
+                            description: "${dive.description}", 
+                            duration: 30,
+                            location: "${dive.location}"
+                        }
+                    ) {
+                        name
+                        date
+                        description
+                        duration 
+                        location
+                    }
+                }
+        `
+
+        await request(app)
+            .post('/graphql')
+            .send({
+                query: updateDiveMutation
+            })
+            .expect(200)
+            .then(response => {
+                expect(response.body.errors).toBeDefined();
+                expect(response.body.errors[0].message).toBe("You have to be logged in to update dives!")
+            })
+        });
+
+        it('should return error You cannot access this dive if incorrect user is logged in', async () => {
+            const user = await db.saveUser(createTestUserData());
+            const user1 = await db.saveUser(createTestUserData());
+            const dive = await diveDb.saveDive(user.id, createTestDiveData());
+
+            const updateDiveMutation = `
+                mutation updateDive {
+                    updateDiveById(
+                        id: ${dive.id}, 
+                        patch: {
+                            name: "Dive2",
+                            date: "${dive.date}",
+                            description: "${dive.description}", 
+                            duration: 30,
+                            location: "${dive.location}"
+                        }
+                    ) {
+                        name
+                        date
+                        description
+                        duration 
+                        location
+                    }
+                }
+            `
+
+            const jwtToken = jwtGenerator(user1.id);
+
+            await request(app)
+                .post('/graphql')
+                .send({
+                    query: updateDiveMutation
+                })
+                .set('Authorization', `Bearer ${jwtToken}`)
+                .expect(200)
+                .then(response => {
+                    expect(response.body.errors).toBeDefined();
+                    expect(response.body.errors[0].message).toBe("You can't access this dive!");
+                })
+
+        });
+    })
+
+    describe('deleteDiveById mutation', () => {
+        it('should delete dive given dive id if user is logged in', async () => {
+            const user = await db.saveUser(createTestUserData());
+            const dive = await diveDb.saveDive(user.id, createTestDiveData());
+
+            const deleteDiveMutation = `
+            mutation deleteDiveById {
+                deleteDiveById(id: ${dive.id}) 
+              }
+            `
+
+            const jwtToken = jwtGenerator(user.id);
+
+            await request(app)
+                .post('/graphql')
+                .send({
+                    query: deleteDiveMutation
+                })
+                .set('Authorization', `Bearer ${jwtToken}`)
+                .expect(200)
+                .then(response => {
+                    expect(response.body.errors).toBeUndefined();
+                    expect(response.body.data.deleteDiveById).toEqual(dive.id);
+                })
+        });
+
+        it('should return an error You cannot delete a dive if user is not logged in', async () => {
+            const user = await db.saveUser(createTestUserData());
+            const dive = await diveDb.saveDive(user.id, createTestDiveData());
+
+            const deleteDiveMutation = `
+            mutation deleteDiveById {
+                deleteDiveById(id: ${dive.id}) 
+              }
+            `
+
+            await request(app)
+                .post('/graphql')
+                .send({
+                    query: deleteDiveMutation
+                })
+                .expect(200)
+                .then(response => {
+                    expect(response.body.errors).toBeDefined();
+                    expect(response.body.errors[0].message).toBe("You have to be logged in to delete this dive!");
+                })
+        });
+
+        it('should return an error You cannot delete this dive if its not users dive', async () => {
+            const user = await db.saveUser(createTestUserData());
+            const user1 = await db.saveUser(createTestUserData());
+            const dive = await diveDb.saveDive(user.id, createTestDiveData());
+
+            const deleteDiveMutation = `
+            mutation deleteDiveById {
+                deleteDiveById(id: ${dive.id}) 
+              }
+            `
+
+            const jwtToken = jwtGenerator(user1.id);
+
+            await request(app)
+                .post('/graphql')
+                .send({
+                    query: deleteDiveMutation
+                })
+                .set('Authorization', `Bearer ${jwtToken}`)
+                .expect(200)
+                .then(response => {
+                    expect(response.body.errors).toBeDefined();
+                    expect(response.body.errors[0].message).toBe("You can't delete this dive!");
+                })
+
+        })
     })
 })
