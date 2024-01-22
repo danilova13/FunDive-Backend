@@ -4,7 +4,7 @@ import { JWTPayload } from '../model/user';
 // function that generates jwt
 export function jwtGenerator(id: number) {
     const payload: JWTPayload = {
-        userId: id
+        userId: id,
     }
     try {
         return jwt.sign(payload, process.env.jwtSecret as string, { expiresIn: "10h" });
