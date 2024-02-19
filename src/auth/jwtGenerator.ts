@@ -1,8 +1,8 @@
-import jwt from 'jsonwebtoken';
-import { JWTPayload } from '../model/user';
+import jwt, { JwtPayload } from 'jsonwebtoken';
+import { JWTPayload } from './types';
 
 // function that generates jwt
-export function jwtGenerator(id: number) {
+export function jwtGenerator(id: number): string {
     const payload: JWTPayload = {
         userId: id,
     }

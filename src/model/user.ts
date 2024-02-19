@@ -33,10 +33,6 @@ export type LoginForm = {
     password: string;
 }
 
-export type JWTPayload = {
-    userId: number
-}
-
 export function validateUserForm(userForm: UserForm, areFieldsRequired: Boolean): UserForm {
         // if the email is in the form, validate email
         if (userForm.email) {

@@ -1,26 +1,27 @@
 import jwt from 'jsonwebtoken';
 import { Request, Response } from 'express';
+import { GraphQLContext, JWTPayload } from './types';
 
 
-export const getUser = async(jwtToken: string) => {
+export const getUser = async(jwtToken: string): Promise<JWTPayload | null> => {
     try {
         if (!jwtToken) {
           throw new Error('Not Authorized!')
         }
         const user = jwt.verify(jwtToken, process.env.jwtSecret as string);
-        return user;
+        return user as JWTPayload;
       } catch (error) {
         return null;
       }
 }
 
-export const context = async ({ req, res }: {req: Request, res: Response}) => {
+export const context = async ({ req, res }: {req: Request, res: Response}): Promise<GraphQLContext> => {
    
     // get user token from the headers
     const authHeader = req.headers.authorization || '';
 
     if (!authHeader) {
-        return;
+        return {};
     }
 
     const [ bearer, jwtToken ] = authHeader.split(' '); 

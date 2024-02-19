@@ -5,6 +5,8 @@ import { initiateDB } from './db';
 import { UserService } from './services/userService';
 import { DiveService } from './services/diveService';
 import { DiveDB } from './db/dive';
+import { expressMiddleware } from '@apollo/server/express4';
+import { context } from './auth/middleware';
 
 // create new app
 async function NewApp() {
@@ -22,7 +24,12 @@ async function NewApp() {
     
     await graphqlServer.start();
     // apply Apollo GrapqhQL middleware
-    graphqlServer.applyMiddleware({app, path: '/graphql'});
+    app.use(
+        express.json(),
+        expressMiddleware(graphqlServer, {
+            context
+        }),
+      );
 
     // health check route
     app.get('/health', (req: Request, res: Response) => {

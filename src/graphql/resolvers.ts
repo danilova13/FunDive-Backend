@@ -1,4 +1,3 @@
-import { ApolloServer, gql } from "apollo-server-express";
 import { UserService } from "../services/userService";
 import { UserForm, LoginForm } from "../model/user";
 import { DiveService } from "../services/diveService";

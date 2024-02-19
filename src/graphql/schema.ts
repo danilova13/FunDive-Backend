@@ -1,6 +1,4 @@
-import { gql } from "apollo-server-express";
-
-export const typeDefs = gql(`
+export const typeDefs = `#graphql
     type Query {
         health: String
         getUserById (id: Int!): User
@@ -88,4 +86,4 @@ export const typeDefs = gql(`
             id: Int!
         ): Int!
     }
-`);
+`;

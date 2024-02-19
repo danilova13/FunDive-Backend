@@ -1,5 +1,5 @@
 # Use the Node.js 18 image from Docker Hub
-FROM node:18
+FROM node:20
 
 RUN apt update && apt install -y netcat-traditional iputils-ping
 

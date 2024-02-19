@@ -2,7 +2,7 @@
   "name": "fundive-backend",
   "version": "1.0.0",
   "engines": {
-    "node": "18.x"
+    "node": "20.x"
   },
   "description": "",
   "main": "index.js",
@@ -29,7 +29,7 @@
   "devDependencies": {
     "@faker-js/faker": "^8.3.1",
     "@types/bcrypt": "^5.0.2",
-    "@types/express": "^4.17.17",
+    "@types/express": "^4.17.21",
     "@types/jest": "^29.5.10",
     "@types/jsonwebtoken": "^9.0.5",
     "@types/supertest": "^6.0.2",
@@ -53,14 +53,12 @@
     ]
   },
   "dependencies": {
-    "apollo-server-core": "^3.12.1",
-    "apollo-server-express": "^3.12.1",
+    "@apollo/server": "^4.10.0",
     "bcrypt": "^5.1.1",
     "change-case": "^4.1.2",
     "email-validator": "^2.0.4",
     "express": "^4.18.2",
     "graphql": "^16.8.1",
-    "graphql-middleware": "6.1.35",
     "jsonwebtoken": "^9.0.2",
     "libphonenumber-js": "^1.10.49",
     "node-pg-migrate": "^6.2.2",
