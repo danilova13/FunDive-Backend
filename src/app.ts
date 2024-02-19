@@ -7,6 +7,7 @@ import { DiveService } from './services/diveService';
 import { DiveDB } from './db/dive';
 import { expressMiddleware } from '@apollo/server/express4';
 import { context } from './auth/middleware';
+import cors from 'cors';
 
 // create new app
 async function NewApp() {
@@ -14,6 +15,7 @@ async function NewApp() {
     const app = express();
     // middleware to parse JSON request bodies
     app.use(express.json());
+    app.use(cors());
 
     const pool = await initiateDB();
     const userDB = new UserDB(pool);
